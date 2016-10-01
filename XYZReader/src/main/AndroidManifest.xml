@@ -47,7 +47,9 @@
             android:name=".data.ItemsProvider"
             android:authorities="com.example.xyzreader"
             android:exported="false" />
-
+        <meta-data
+            android:name="com.example.xyzreader.CustomGlideModule"
+            android:value="GlideModule" />
     </application>
 
 </manifest>
