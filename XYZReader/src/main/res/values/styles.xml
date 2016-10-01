@@ -77,4 +77,10 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="CustomActionBarTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="CustomActionBarTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>
