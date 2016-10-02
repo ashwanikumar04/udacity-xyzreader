@@ -9,18 +9,16 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
@@ -118,9 +116,12 @@ public class ArticleListActivity extends AppCompatActivity implements
 //        int columnCount = getResources().getInteger(R.integer.list_column_count);
 //        StaggeredGridLayoutManager sglm =
 //                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-
-        mRecyclerView.setLayoutManager(gridLayoutManager);
+//        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        int columnCount = getResources().getInteger(R.integer.list_column_count);
+        StaggeredGridLayoutManager sglm =
+                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+        mRecyclerView.setLayoutManager(sglm);
+        // mRecyclerView.setLayoutManager(gridLayoutManager);
     }
 
     @Override
@@ -166,12 +167,17 @@ public class ArticleListActivity extends AppCompatActivity implements
                             DateUtils.FORMAT_ABBREV_ALL).toString()
                             + " by "
                             + mCursor.getString(ArticleLoader.Query.AUTHOR));
-            Glide
-                    .with(ArticleListActivity.this)
-                    .load(
-                            mCursor.getString(ArticleLoader.Query.THUMB_URL))
-                    .placeholder(R.drawable.placeholder)
-                    .into(holder.thumbnailView);
+//            Glide
+//                    .with(ArticleListActivity.this)
+//                    .load(
+//                            mCursor.getString(ArticleLoader.Query.THUMB_URL))
+//                    .placeholder(R.drawable.placeholder)
+//                    .into(holder.thumbnailView);
+
+            holder.thumbnailView.setImageUrl(
+                    mCursor.getString(ArticleLoader.Query.THUMB_URL),
+                    ImageLoaderHelper.getInstance(ArticleListActivity.this).getImageLoader());
+            holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
 
         }
 
@@ -182,13 +188,13 @@ public class ArticleListActivity extends AppCompatActivity implements
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView thumbnailView;
+        public DynamicHeightNetworkImageView thumbnailView;
         public TextView titleView;
         public TextView subtitleView;
 
         public ViewHolder(View view) {
             super(view);
-            thumbnailView = (ImageView) view.findViewById(R.id.thumbnail);
+            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
             titleView = (TextView) view.findViewById(R.id.article_title);
             subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
         }
