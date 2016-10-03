@@ -7,6 +7,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.graphics.Palette;
@@ -79,6 +80,7 @@ public class ArticleDetailFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().initLoader(0, null, this);
     }
+    private String iconId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -98,6 +100,11 @@ public class ArticleDetailFragment extends Fragment implements
                 });
 
         bindViews();
+        Bundle bundle = getActivity().getIntent().getExtras();
+
+        if (Build.VERSION.SDK_INT >= 21) {
+            iconId = bundle.getString("iconId");
+        }
         return mRootView;
     }
 
@@ -107,12 +114,16 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
+
         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+        DynamicHeightNetworkImageView imageView = (DynamicHeightNetworkImageView) mRootView.findViewById(R.id.thumbnail);
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-
+        if (Build.VERSION.SDK_INT >= 21) {
+            imageView.setTransitionName(iconId);
+        }
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
@@ -127,6 +138,10 @@ public class ArticleDetailFragment extends Fragment implements
                             + mCursor.getString(ArticleLoader.Query.AUTHOR)
                             + "</font>"));
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
+            imageView.setImageUrl(
+                    mCursor.getString(ArticleLoader.Query.THUMB_URL),
+                    ImageLoaderHelper.getInstance(getActivity()).getImageLoader());
+            imageView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override

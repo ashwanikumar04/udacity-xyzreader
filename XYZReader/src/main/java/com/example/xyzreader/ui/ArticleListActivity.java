@@ -7,7 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.Loader;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -149,8 +153,23 @@ public class ArticleListActivity extends AppCompatActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
+                    if (Build.VERSION.SDK_INT >= 21) {
+                        View icon = view.findViewById(R.id.thumbnail);
+                        intent.putExtra("iconId", icon.getTransitionName());
+                        ActivityOptionsCompat options;
+                        options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                ArticleListActivity.this,
+                                new Pair<>(icon,
+                                        icon.getTransitionName())
+                        );
+                        ActivityCompat.startActivity(ArticleListActivity.this, intent, options.toBundle());
+                    } else {
+                        startActivity(intent);
+                    }
+
+
                 }
             });
             return vh;
@@ -173,6 +192,9 @@ public class ArticleListActivity extends AppCompatActivity implements
 //                            mCursor.getString(ArticleLoader.Query.THUMB_URL))
 //                    .placeholder(R.drawable.placeholder)
 //                    .into(holder.thumbnailView);
+            if (Build.VERSION.SDK_INT >= 21) {
+                holder.thumbnailView.setTransitionName("icon_" + position);
+            }
 
             holder.thumbnailView.setImageUrl(
                     mCursor.getString(ArticleLoader.Query.THUMB_URL),
